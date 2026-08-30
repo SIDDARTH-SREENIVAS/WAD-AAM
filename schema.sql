@@ -45,9 +45,9 @@ CREATE TABLE IF NOT EXISTS feedback (
 -- Default admin password is 'admin123' (hashed using BCRYPT)
 -- Default student passwords are 'student123' (hashed using BCRYPT)
 INSERT INTO users (username, password, role) VALUES
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-('john_doe', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student'),
-('jane_smith', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student')
+('admin', '$2y$10$TGjdsAQxvkIBJOE.bTo/vOYwHpnFLGh3QRz6JiNc3H3RNMLROYgre', 'admin'),
+('john_doe', '$2y$10$kAX7RySf/k3A9tIrECRvX.EkG2zeQr4EI6unOdZukctTJYPzxrrde', 'student'),
+('jane_smith', '$2y$10$kAX7RySf/k3A9tIrECRvX.EkG2zeQr4EI6unOdZukctTJYPzxrrde', 'student')
 ON DUPLICATE KEY UPDATE id=id;
 
 -- Insert Default Courses
