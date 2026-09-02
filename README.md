@@ -40,7 +40,7 @@ Make sure your MySQL server is running (e.g., start MySQL service via terminal o
 Run the following command in the project root to create the `course_feedback` database, tables, and seed sample data:
 
 ```bash
-# If your MySQL root user has no password (default XAMPP/MAMP):
+# If your MySQL root user has no password (default XAMPP/Homebrew/MAMP):
 mysql -u root < schema.sql
 
 # If your MySQL root user has a password:
@@ -54,6 +54,44 @@ mysql -u root -p < schema.sql
 3. Select the newly created `course_feedback` database.
 4. Click the **Import** tab in the top navigation.
 5. Click **Choose File**, select [`schema.sql`](schema.sql) from the cloned project folder, and click **Import** (or **Go**) at the bottom.
+
+---
+
+### 🔍 How to Inspect & Verify the Database in MySQL CLI
+
+To verify that the database and tables are populated correctly, enter the MySQL monitor:
+
+```bash
+# Connect to MySQL prompt
+mysql -u root
+# (or 'mysql -u root -p' if password-protected)
+```
+
+Inside the `mysql>` prompt, run:
+
+```sql
+-- 1. View all databases
+SHOW DATABASES;
+
+-- 2. Select the course feedback database
+USE course_feedback;
+
+-- 3. View all created tables (courses, feedback, users)
+SHOW TABLES;
+
+-- 4. View table schema and column types
+DESC courses;
+DESC users;
+DESC feedback;
+
+-- 5. View sample data records
+SELECT * FROM courses;
+SELECT * FROM users;
+SELECT * FROM feedback;
+
+-- 6. Exit MySQL monitor
+EXIT;
+```
 
 ---
 
