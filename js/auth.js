@@ -33,9 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     submitBtn.textContent = 'Signing in...';
                 }
 
-                const response = await fetch('php/auth.php?action=login', {
+                const response = await fetch(`${API_BASE}/login.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ username, password })
                 });
 
@@ -100,9 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     submitBtn.textContent = 'Creating account...';
                 }
 
-                const response = await fetch('php/auth.php?action=register', {
+                const response = await fetch(`${API_BASE}/register.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ username, password, confirm_password })
                 });
 
@@ -127,7 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function checkAuthAndRedirect() {
     try {
-        const response = await fetch('php/auth.php?action=check_session');
+        const response = await fetch(`${API_BASE}/check_session.php`, {
+            credentials: 'include'
+        });
         const data = await response.json();
         if (data.success && data.data && data.data.authenticated) {
             const role = data.data.user.role;
@@ -144,7 +148,9 @@ async function checkAuthAndRedirect() {
 
 async function logoutUser() {
     try {
-        await fetch('php/auth.php?action=logout');
+        await fetch(`${API_BASE}/logout.php`, {
+            credentials: 'include'
+        });
     } catch (e) {
         console.error('Logout error:', e);
     }

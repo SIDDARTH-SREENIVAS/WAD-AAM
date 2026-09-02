@@ -1,7 +1,5 @@
-/**
- * Course Feedback Management System
- * Core Client-side Logic (Theme Switcher, Modal Helpers, Toast Alerts)
- */
+// Global API Base URL (auto-resolving)
+window.API_BASE = window.location.origin.startsWith('http') ? 'course_api' : 'http://localhost/course_api';
 
 // --------------------------------------------------------
 // THEME CONTROLLER

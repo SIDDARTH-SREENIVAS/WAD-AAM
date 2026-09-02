@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function verifyAdminAuth() {
     try {
-        const response = await fetch('php/auth.php?action=check_session');
+        const response = await fetch(`${API_BASE}/check_session.php`, {
+            credentials: 'include'
+        });
         const data = await response.json();
 
         if (!data.success || !data.data || !data.data.authenticated || data.data.user.role !== 'admin') {
@@ -48,9 +50,9 @@ async function verifyAdminAuth() {
 async function loadAdminDashboardData() {
     try {
         const [statsRes, coursesRes, feedbacksRes] = await Promise.all([
-            fetch('php/stats.php'),
-            fetch('php/courses.php?action=list'),
-            fetch(`php/feedback.php?action=list${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''}`)
+            fetch(`${API_BASE}/get_stats.php`, { credentials: 'include' }),
+            fetch(`${API_BASE}/get_courses.php`, { credentials: 'include' }),
+            fetch(`${API_BASE}/get_feedback.php${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`, { credentials: 'include' })
         ]);
 
         const statsData = await statsRes.json();
@@ -223,9 +225,10 @@ function setupCourseModalsAndForms() {
                     submitBtn.textContent = 'Saving...';
                 }
 
-                const res = await fetch('php/courses.php?action=create', {
+                const res = await fetch(`${API_BASE}/add_course.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ course_code, course_name, instructor })
                 });
 
@@ -273,9 +276,10 @@ function setupCourseModalsAndForms() {
                     submitBtn.textContent = 'Updating...';
                 }
 
-                const res = await fetch('php/courses.php?action=update', {
+                const res = await fetch(`${API_BASE}/update_course.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify({ id: parseInt(id), course_code, course_name, instructor })
                 });
 
@@ -335,7 +339,9 @@ function setupSearchFilter() {
 
 async function loadFeedbacksOnly() {
     try {
-        const res = await fetch(`php/feedback.php?action=list${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''}`);
+        const res = await fetch(`${API_BASE}/get_feedback.php${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`, {
+            credentials: 'include'
+        });
         const data = await res.json();
         allFeedbacks = (data.success && data.data.feedbacks) ? data.data.feedbacks : [];
         renderFeedbacksTable();
@@ -346,8 +352,9 @@ async function loadFeedbacksOnly() {
 
 async function deleteCourseRecord(id) {
     try {
-        const res = await fetch(`php/courses.php?action=delete&id=${id}`, {
-            method: 'POST'
+        const res = await fetch(`${API_BASE}/delete_course.php?id=${id}`, {
+            method: 'POST',
+            credentials: 'include'
         });
         const data = await res.json();
 

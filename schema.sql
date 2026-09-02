@@ -1,4 +1,3 @@
-SELECT * FROM courses;
 -- Course Feedback Management System Database Schema
 -- Run this script in your MySQL instance to create the database and tables.
 

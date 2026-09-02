@@ -24,7 +24,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function verifyStudentAuth() {
     try {
-        const response = await fetch('php/auth.php?action=check_session');
+        const response = await fetch(`${API_BASE}/check_session.php`, {
+            credentials: 'include'
+        });
         const data = await response.json();
 
         if (!data.success || !data.data || !data.data.authenticated || data.data.user.role !== 'student') {
@@ -50,8 +52,8 @@ async function loadStudentData() {
     try {
         // Fetch courses and feedbacks in parallel
         const [coursesRes, feedbacksRes] = await Promise.all([
-            fetch('php/courses.php?action=list'),
-            fetch('php/feedback.php?action=list&my_feedback=1')
+            fetch(`${API_BASE}/get_courses.php`, { credentials: 'include' }),
+            fetch(`${API_BASE}/get_feedback.php?my_feedback=1`, { credentials: 'include' })
         ]);
 
         const coursesData = await coursesRes.json();
@@ -104,7 +106,7 @@ function renderFeedbackTable() {
     if (!tbody) return;
 
     if (myFeedbacks.length === 0) {
-        if (tbody) tbody.innerHTML = '';
+        tbody.innerHTML = '';
         if (feedbackTableContainer) feedbackTableContainer.style.display = 'none';
         if (emptyFeedbackState) emptyFeedbackState.style.display = 'block';
         return;
@@ -179,7 +181,7 @@ function renderFeedbackTable() {
 }
 
 function setupStarRatingInputs() {
-    // Enable keyboard accessibility or star tooltips if needed
+    // Interactive styling handled by CSS
 }
 
 function setupFeedbackSubmissionForm() {
@@ -215,9 +217,10 @@ function setupFeedbackSubmissionForm() {
                 submitBtn.textContent = 'Submitting...';
             }
 
-            const res = await fetch('php/feedback.php?action=create', {
+            const res = await fetch(`${API_BASE}/submit_feedback.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     course_id: parseInt(course_id),
                     rating: parseInt(ratingInput.value),
@@ -268,9 +271,10 @@ function setupFeedbackEditForm() {
                 submitBtn.textContent = 'Saving...';
             }
 
-            const res = await fetch('php/feedback.php?action=update', {
+            const res = await fetch(`${API_BASE}/update_feedback.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     id: parseInt(id),
                     rating: parseInt(ratingInput.value),
@@ -321,8 +325,9 @@ function setupDeleteModal() {
 
 async function deleteFeedbackRecord(id) {
     try {
-        const res = await fetch(`php/feedback.php?action=delete&id=${id}`, {
-            method: 'POST'
+        const res = await fetch(`${API_BASE}/delete_feedback.php?id=${id}`, {
+            method: 'POST',
+            credentials: 'include'
         });
         const data = await res.json();
 

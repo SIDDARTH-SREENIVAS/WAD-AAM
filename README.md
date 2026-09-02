@@ -97,18 +97,18 @@ EXIT;
 
 ### Step 3: Configure Database Credentials
 
-Open [`php/config.php`](php/config.php) in your code editor and verify your local database connection settings:
+Open [`course_api/db_connect.php`](course_api/db_connect.php) in your code editor and verify your local database connection settings:
 
 ```php
-// Database connection details inside php/config.php
+// Database connection details inside course_api/db_connect.php
 $host    = '127.0.0.1';        // Database host (default: localhost or 127.0.0.1)
-$db      = 'course_feedback';  // Database name
+$db      = 'course_feedback';  // Database name in phpMyAdmin
 $user    = 'root';             // Database username (default: root)
 $pass    = '';                 // Database password (default: empty for XAMPP, 'root' for MAMP)
 $charset = 'utf8mb4';
 ```
 
-> **Note:** If your MySQL server uses a password (e.g., `root`, `admin`, or a custom password), update `$pass = 'your_password';` accordingly.
+> **Note:** If your MySQL/phpMyAdmin setup uses a password (e.g., `root`, `admin`, or a custom password), update `$pass = 'your_password';` accordingly.
 
 ---
 
@@ -168,12 +168,21 @@ wad/
 │   ├── auth.js                 # Pure JS: Login & registration handlers with validation
 │   ├── student.js              # Pure JS: Dynamic course feed, interactive star rating & feedback CRUD
 │   └── admin.js                # Pure JS: Analytics metrics & course CRUD
-├── php/
-│   ├── config.php              # Pure PHP: Database abstraction & MySQL PDO connection
-│   ├── auth.php                # Pure PHP: Authentication API (login, register, check_session, logout)
-│   ├── courses.php             # Pure PHP: Course API (list, create, update, delete)
-│   ├── feedback.php            # Pure PHP: Feedback API (list, create, update, delete)
-│   └── stats.php               # Pure PHP: Admin analytics and statistics calculation API
+├── course_api/
+│   ├── db_connect.php          # Database connection (PDO MySQL / phpMyAdmin)
+│   ├── login.php               # Authenticate credentials & initialize session
+│   ├── register.php            # Register new student account in MySQL
+│   ├── check_session.php       # Verify active session and role
+│   ├── logout.php              # Destroy session and log out
+│   ├── get_courses.php         # Fetch courses list
+│   ├── add_course.php          # Insert new course (Admin only)
+│   ├── update_course.php       # Update existing course (Admin only)
+│   ├── delete_course.php       # Delete course & cascading reviews (Admin only)
+│   ├── get_feedback.php        # Fetch feedback reviews joined with courses & students
+│   ├── submit_feedback.php     # Submit course evaluation rating & comments (Student only)
+│   ├── update_feedback.php     # Update feedback review (Student only)
+│   ├── delete_feedback.php     # Delete feedback review (Student only)
+│   └── get_stats.php           # Calculate metrics & averages (Admin only)
 ├── schema.sql                  # Database schema with tables and seeded records
 └── README.md                   # Project documentation & setup guide
 ```
@@ -182,36 +191,35 @@ wad/
 
 ## 🔌 API Endpoints Reference
 
-All frontend files interact with backend PHP scripts via asynchronous JSON requests (`fetch`):
+All frontend files interact with dedicated backend PHP scripts via asynchronous JSON requests (`fetch`):
 
-### 1. Authentication API (`php/auth.php`)
-- `GET ?action=check_session` &rarr; Checks active session and user role.
-- `POST ?action=login` &rarr; Authenticates user credentials (`{username, password}`).
-- `POST ?action=register` &rarr; Creates a new student account (`{username, password, confirm_password}`).
-- `GET/POST ?action=logout` &rarr; Destroys active session and logs out user.
+### 1. Authentication Endpoints
+- **`POST course_api/login.php`** &rarr; Authenticates user credentials (`{username, password}`).
+- **`POST course_api/register.php`** &rarr; Registers a new student account (`{username, password, confirm_password}`).
+- **`GET course_api/check_session.php`** &rarr; Checks active login session and user role.
+- **`GET/POST course_api/logout.php`** &rarr; Destroys active session and logs out user.
 
-### 2. Courses API (`php/courses.php`)
-- `GET ?action=list` &rarr; Retrieves all available courses.
-- `GET ?action=get&id=X` &rarr; Retrieves details for a specific course ID.
-- `POST ?action=create` *(Admin only)* &rarr; Adds a new course (`{course_code, course_name, instructor}`).
-- `POST ?action=update` *(Admin only)* &rarr; Updates course details (`{id, course_code, course_name, instructor}`).
-- `POST ?action=delete&id=X` *(Admin only)* &rarr; Deletes a course and cascades to remove its feedbacks.
+### 2. Course Management Endpoints
+- **`GET course_api/get_courses.php`** &rarr; Retrieves all available courses.
+- **`POST course_api/add_course.php`** *(Admin only)* &rarr; Adds a new course (`{course_code, course_name, instructor}`).
+- **`POST course_api/update_course.php`** *(Admin only)* &rarr; Updates course details (`{id, course_code, course_name, instructor}`).
+- **`POST course_api/delete_course.php?id=X`** *(Admin only)* &rarr; Deletes a course and cascades to remove its feedbacks.
 
-### 3. Feedback API (`php/feedback.php`)
-- `GET ?action=list` &rarr; Retrieves feedback reviews (supports `?search=keyword` or `?my_feedback=1`).
-- `POST ?action=create` *(Student only)* &rarr; Submits a review (`{course_id, rating, comments}`).
-- `POST ?action=update` *(Student only)* &rarr; Updates author's review (`{id, rating, comments}`).
-- `POST ?action=delete&id=X` *(Author only)* &rarr; Deletes author's review.
+### 3. Feedback Management Endpoints
+- **`GET course_api/get_feedback.php`** &rarr; Retrieves feedback reviews (supports `?search=keyword` or `?my_feedback=1`).
+- **`POST course_api/submit_feedback.php`** *(Student only)* &rarr; Submits a review (`{course_id, rating, comments}`).
+- **`POST course_api/update_feedback.php`** *(Student only)* &rarr; Updates author's review (`{id, rating, comments}`).
+- **`POST course_api/delete_feedback.php?id=X`** *(Author only)* &rarr; Deletes author's review.
 
-### 4. Admin Statistics API (`php/stats.php`)
-- `GET` *(Admin only)* &rarr; Calculates total courses, total reviews, and overall average star rating.
+### 4. Admin Statistics Endpoint
+- **`GET course_api/get_stats.php`** *(Admin only)* &rarr; Calculates total courses, total reviews, and overall average star rating.
 
 ---
 
 ## 🔧 Troubleshooting
 
 - **`Database Connection Failed: Access denied for user 'root'@'localhost'`**:
-  Open [`php/config.php`](php/config.php) and check your MySQL password `$pass`.
+  Open [`course_api/db_connect.php`](course_api/db_connect.php) and check your MySQL password `$pass`.
 - **`SQLSTATE[HY000] [2002] Connection refused`**:
   Make sure your MySQL database service is running on port 3306.
 - **Port 8000 already in use**:
