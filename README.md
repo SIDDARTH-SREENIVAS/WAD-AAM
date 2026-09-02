@@ -1,78 +1,90 @@
 # Course Feedback Management System
 
-A modern, responsive, and secure web application designed for students to submit course feedback and administrators to manage the system. Built using HTML, CSS, JavaScript, PHP, and MySQL.
+A decoupled, responsive, and secure Web Application Development (WAD) project designed for students to submit course evaluations and administrators to moderate feedback and manage course curricula.
 
 ---
 
-## Key Features
+## 🏛️ Clean Architecture & Separation of Concerns
 
-- **Dual-role Authentication**: Supports Student and Administrator dashboards.
+The project is structured into distinct, dedicated layers where **HTML**, **CSS**, **JavaScript**, and **PHP** reside in separate files:
+
+```
+wad/
+├── index.html                  # Pure HTML: User sign-in interface
+├── register.html               # Pure HTML: Student registration interface
+├── student_dashboard.html      # Pure HTML: Student evaluation portal
+├── admin_dashboard.html        # Pure HTML: Administrator control panel
+├── css/
+│   └── style.css               # Pure CSS: Design system, dark/light themes, animations & components
+├── js/
+│   ├── app.js                  # Pure JS: Theme switcher, modal manager & toast alerts
+│   ├── auth.js                 # Pure JS: Login & registration handlers with validation
+│   ├── student.js              # Pure JS: Dynamic course fetching, feedback CRUD & modals
+│   └── admin.js                # Pure JS: Admin analytics, course CRUD & feedback moderation
+├── php/
+│   ├── config.php              # Pure PHP: Database abstraction & MySQL PDO connection
+│   ├── auth.php                # Pure PHP: Authentication API (login, register, check_session, logout)
+│   ├── courses.php             # Pure PHP: Course API (list, create, update, delete)
+│   ├── feedback.php            # Pure PHP: Feedback API (list, create, update, delete)
+│   └── stats.php               # Pure PHP: Admin analytics and statistics API
+├── schema.sql                  # Setup script for MySQL tables & sample records
+└── README.md                   # Documentation & setup guide
+```
+
+---
+
+## ✨ Key Features
+
+- **Decoupled Frontend & Backend**: Pure HTML views communicating with PHP REST endpoints via JSON `fetch()` requests.
+- **Dual-role Authentication**: Supports Student and Administrator dashboards with session verification.
 - **Student Dashboard**:
-  - List of courses pending review.
-  - Interactive 5-star rating widget.
-  - CRUD operations: Students can submit, view, edit, and delete their own feedback.
-- **Admin Dashboard**:
-  - Statistics summary counters (total courses, reviews, average rating).
+  - Dynamic course selection dropdown (filters out previously reviewed courses).
+  - Interactive 5-star rating widget with hover and click support.
+  - Complete CRUD: Students can submit, view, edit, and delete their own feedback.
+- **Administrator Control Panel**:
+  - Live statistics summary counters (Total Courses, Total Reviews, Overall Average Rating).
   - Course CRUD operations: Administrators can add, edit, and delete courses.
-  - Feedback moderation: Search/filter feedback records and delete inappropriate posts.
-- **Visual Design**:
-  - Sleek glassmorphism elements with responsive layouts.
-  - Smooth micro-animations (e.g. entry fades, interactive stars, and hover states).
-  - Dark Mode and Light Mode theme switcher with local storage persistence.
-- **Robust Fail-safe Connection**:
-  - If MySQL is offline, the backend seamlessly falls back to a **Demo Mode** using Session-based storage, allowing full review of CRUD operations instantly without setup.
+  - Feedback moderation: Real-time search/filter and deletion of inappropriate feedback.
+- **Modern UI & Aesthetic**:
+  - Glassmorphism styling, clean modern typography (Inter), and CSS micro-animations.
+  - Dark Mode and Light Mode theme switcher with `localStorage` persistence.
+- **Relational Database**:
+  - Backed directly by MySQL with relational foreign keys and cascaded deletions.
 
 ---
 
-## Installation & Setup
+## 🚀 Installation & Setup
 
-### Option 1: Live MySQL Database Setup (Recommended)
+1. **Start MySQL**:
+   Ensure your local MySQL service (via XAMPP, MAMP, or standalone MySQL) is running.
 
-1. **Start MySQL**: Make sure your local MySQL instance (e.g., via XAMPP, MAMP, or native MySQL) is active.
 2. **Import Database Schema**:
-   - Run the SQL statements inside [`schema.sql`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/schema.sql) in your database administration tool (like phpMyAdmin) or run the command:
-     ```bash
-     mysql -u root -p < schema.sql
-     ```
+   Import [`schema.sql`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/schema.sql) into MySQL using phpMyAdmin or terminal:
+   ```bash
+   mysql -u root -p < schema.sql
+   ```
+
 3. **Database Configuration**:
-   - Open [`config.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/config.php).
-   - If your MySQL user password is not empty, update the config connection block:
-     ```php
-     $user = 'root';
-     $pass = 'your_mysql_password';
-     ```
+   - Open [`php/config.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/php/config.php).
+   - Update `$user` and `$pass` if your local MySQL has a specific password configured.
+
 4. **Launch Web Server**:
-   - Place this project directory in your web server root (e.g., `htdocs` for XAMPP).
-   - Alternatively, navigate to the folder in your shell and start the PHP built-in server:
+   - Start the PHP development server:
      ```bash
-     php -S localhost:8000
+     php -S 127.0.0.1:8000
      ```
-   - Visit `http://localhost:8000` in your web browser.
-
-### Option 2: Running in Offline Demo Mode (Instant Preview)
-
-If you don't have MySQL or PHP configured yet, the app automatically transitions to **Demo Mode** upon failure to connect to MySQL. 
-- You can run it on any PHP server (like MAMP or PHP built-in server) without database configuration.
-- Standard default users are pre-created inside session memory:
-  - **Administrator account**:
-    - **Username**: `admin`
-    - **Password**: `admin123`
-  - **Student account**:
-    - **Username**: `john_doe`
-    - **Password**: `student123`
+   - Open `http://127.0.0.1:8000/index.html` in your browser.
 
 ---
 
-## File Structure
+## 👥 Seeded User Accounts (from `schema.sql`)
 
-- [`schema.sql`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/schema.sql) — Setup script for MySQL tables and initial mock data.
-- [`config.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/config.php) — Database connection configuration with fallback mode.
-- [`index.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/index.php) — Landing page & authentication (Login / Signup).
-- [`register.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/register.php) — Student registration.
-- [`logout.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/logout.php) — Standard session termination.
-- [`student_dashboard.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/student_dashboard.php) — Student interface.
-- [`admin_dashboard.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/admin_dashboard.php) — Admin dashboard.
-- [`course_actions.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/course_actions.php) — Course Create/Update/Delete handlers.
-- [`feedback_actions.php`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/feedback_actions.php) — Feedback Create/Update/Delete handlers.
-- [`css/style.css`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/css/style.css) — Visual custom styling.
-- [`js/app.js`](file:///Users/siddarthsreenivas/Desktop/new_folder/SIDDARTHSREENIVAS/wad/js/app.js) — Theme toggling, modal bindings, and rating validators.
+- **Administrator**:
+  - **Username**: `admin`
+  - **Password**: `admin123`
+- **Student**:
+  - **Username**: `john_doe`
+  - **Password**: `student123`
+- **Student**:
+  - **Username**: `jane_smith`
+  - **Password**: `student123`

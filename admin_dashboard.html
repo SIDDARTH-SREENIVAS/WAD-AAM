@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Administrator portal for managing academic courses, monitoring evaluation metrics, and moderating student feedback reviews.">
+    <title>Administrator Control Panel - Course Feedback Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="animate-fade-in">
+    <div class="app-container">
+        <!-- Dashboard Header -->
+        <header>
+            <div class="logo-section">
+                <h1>Feedback Loop</h1>
+                <p>Welcome back, <strong id="admin-display-name">Administrator</strong> <span class="badge badge-admin">Administrator</span></p>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme"></button>
+                <button onclick="logoutUser()" class="btn btn-secondary btn-sm" id="btn-logout">Sign Out</button>
+            </div>
+        </header>
+
+        <main class="admin-layout">
+            <!-- Top Metric Analytics Summary Cards -->
+            <section class="stats-row" aria-label="Overview Statistics">
+                <div class="stat-card">
+                    <div class="stat-icon" aria-hidden="true">📚</div>
+                    <div class="stat-details">
+                        <h4>Total Courses</h4>
+                        <div class="stat-number" id="stat-total-courses">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" aria-hidden="true">💬</div>
+                    <div class="stat-details">
+                        <h4>Total Reviews</h4>
+                        <div class="stat-number" id="stat-total-feedbacks">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" aria-hidden="true">⭐</div>
+                    <div class="stat-details">
+                        <h4>Average Rating</h4>
+                        <div class="stat-number" id="stat-avg-rating">0 ★</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Course Management Section -->
+            <section class="card-panel">
+                <div class="card-header-flex">
+                    <div>
+                        <h3>Course Management</h3>
+                        <p class="text-muted" style="font-size: 0.9rem;">Add, edit course curricula, or remove obsolete courses</p>
+                    </div>
+                    <button type="button" id="btn-add-course-modal" class="btn btn-primary btn-sm">
+                        + Add New Course
+                    </button>
+                </div>
+
+                <div id="no-courses-state" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">📚</div>
+                    <p>No courses found. Click "+ Add New Course" above to create one.</p>
+                </div>
+
+                <div id="courses-grid" class="admin-courses-grid">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+
+            <!-- Feedback Review Section -->
+            <section class="card-panel">
+                <div class="card-header-flex">
+                    <div>
+                        <h3>Student Feedback Reviews</h3>
+                        <p class="text-muted" style="font-size: 0.9rem;">Review submitted evaluations and ratings across all courses</p>
+                    </div>
+                </div>
+
+                <!-- Search / Filter Form -->
+                <form id="feedback-search-form" class="search-form">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="feedback-search-input" class="input-control" placeholder="Search by course code, professor, student name, or comment keywords...">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                    <button type="button" id="btn-clear-search" class="btn btn-secondary">Clear</button>
+                </form>
+
+                <div id="no-feedback-state" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">🔍</div>
+                    <p>No student feedback records matched your query.</p>
+                </div>
+
+                <div id="admin-feedbacks-table-wrapper" class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Student</th>
+                                <th>Rating</th>
+                                <th>Comments</th>
+                                <th>Submitted Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-feedbacks-tbody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Course Modal -->
+    <div id="add-course-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="add-course-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="add-course-title">Add New Course</h3>
+                <button type="button" class="modal-close" aria-label="Close Modal">&times;</button>
+            </div>
+            <form id="add-course-form">
+                <div class="form-group">
+                    <label for="add-course-code">Course Code</label>
+                    <input type="text" id="add-course-code" name="course_code" class="input-control" required placeholder="e.g. CS401" style="text-transform: uppercase;">
+                </div>
+
+                <div class="form-group">
+                    <label for="add-course-name">Course Title</label>
+                    <input type="text" id="add-course-name" name="course_name" class="input-control" required placeholder="e.g. Artificial Intelligence & Machine Learning">
+                </div>
+
+                <div class="form-group">
+                    <label for="add-course-instructor">Instructor Name</label>
+                    <input type="text" id="add-course-instructor" name="instructor" class="input-control" required placeholder="e.g. Prof. Marvin Minsky">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+                    <button type="submit" id="btn-submit-add-course" class="btn btn-primary">Add Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Course Modal -->
+    <div id="edit-course-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-course-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-course-title">Edit Course Details</h3>
+                <button type="button" class="modal-close" aria-label="Close Modal">&times;</button>
+            </div>
+            <form id="edit-course-form">
+                <input type="hidden" id="edit-course-id" name="id">
+
+                <div class="form-group">
+                    <label for="edit-course-code">Course Code</label>
+                    <input type="text" id="edit-course-code" name="course_code" class="input-control" required style="text-transform: uppercase;">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-course-name">Course Title</label>
+                    <input type="text" id="edit-course-name" name="course_name" class="input-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-course-instructor">Instructor Name</label>
+                    <input type="text" id="edit-course-instructor" name="instructor" class="input-control" required>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+                    <button type="submit" id="btn-submit-edit-course" class="btn btn-primary">Update Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

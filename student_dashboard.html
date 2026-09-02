@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Student portal to evaluate academic courses, submit 5-star ratings, write comments, and manage submitted reviews.">
+    <title>Student Portal - Course Feedback Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="animate-fade-in">
+    <div class="app-container">
+        <!-- Dashboard Header -->
+        <header>
+            <div class="logo-section">
+                <h1>Feedback Loop</h1>
+                <p>Welcome back, <strong id="student-display-name">Student</strong> <span class="badge badge-student">Student</span></p>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme"></button>
+                <button onclick="logoutUser()" class="btn btn-secondary btn-sm" id="btn-logout">Sign Out</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Body Grid -->
+        <main class="dashboard-grid">
+            <!-- Left Side: Submit Course Feedback (Create Operation) -->
+            <section class="card-panel">
+                <h3>Submit Feedback</h3>
+                
+                <div id="all-completed-state" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">🎉</div>
+                    <p>You have submitted feedback for all available courses! Outstanding job.</p>
+                </div>
+
+                <div id="feedback-form-container">
+                    <form id="feedback-submission-form">
+                        <div class="form-group">
+                            <label for="course_id">Select Course</label>
+                            <select id="course_id" name="course_id" class="input-control" required>
+                                <option value="" disabled selected>Loading courses...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rating</label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5" required>
+                                <label for="star5" title="5 stars - Excellent">★</label>
+                                <input type="radio" id="star4" name="rating" value="4">
+                                <label for="star4" title="4 stars - Good">★</label>
+                                <input type="radio" id="star3" name="rating" value="3">
+                                <label for="star3" title="3 stars - Average">★</label>
+                                <input type="radio" id="star2" name="rating" value="2">
+                                <label for="star2" title="2 stars - Poor">★</label>
+                                <input type="radio" id="star1" name="rating" value="1">
+                                <label for="star1" title="1 star - Terrible">★</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="comments">Feedback & Comments</label>
+                            <textarea id="comments" name="comments" class="input-control" rows="4" required placeholder="Share your experience regarding the course content, assignments, and professor..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" id="btn-submit-feedback" class="btn btn-primary btn-full">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Right Side: My Feedbacks List (Read, Update, Delete) -->
+            <section class="card-panel">
+                <h3>My Submitted Feedback</h3>
+                
+                <div id="no-feedback-state" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">📝</div>
+                    <p>You have not submitted any feedback yet. Choose a course on the left to get started!</p>
+                </div>
+
+                <div id="feedbacks-table-wrapper" class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Rating</th>
+                                <th>Comments</th>
+                                <th>Date</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-feedbacks-tbody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Feedback Modal Dialog -->
+    <div id="edit-feedback-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-feedback-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-feedback-title">Edit Course Feedback</h3>
+                <button type="button" class="modal-close" aria-label="Close Modal">&times;</button>
+            </div>
+            <form id="edit-feedback-form">
+                <input type="hidden" id="edit-feedback-id" name="id">
+                
+                <div class="form-group">
+                    <label>Course</label>
+                    <div id="edit-modal-course-name" class="static-value-badge">Loading...</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Rating</label>
+                    <div class="star-rating">
+                        <input type="radio" id="edit-star5" name="edit_rating" value="5" required>
+                        <label for="edit-star5" title="5 stars - Excellent">★</label>
+                        <input type="radio" id="edit-star4" name="edit_rating" value="4">
+                        <label for="edit-star4" title="4 stars - Good">★</label>
+                        <input type="radio" id="edit-star3" name="edit_rating" value="3">
+                        <label for="edit-star3" title="3 stars - Average">★</label>
+                        <input type="radio" id="edit-star2" name="edit_rating" value="2">
+                        <label for="edit-star2" title="2 stars - Poor">★</label>
+                        <input type="radio" id="edit-star1" name="edit_rating" value="1">
+                        <label for="edit-star1" title="1 star - Terrible">★</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-feedback-comments">Updated Comments</label>
+                    <textarea id="edit-feedback-comments" name="comments" class="input-control" rows="4" required></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+                    <button type="submit" id="btn-save-feedback-edit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal Dialog -->
+    <div id="delete-feedback-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-feedback-title">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <h3 id="delete-feedback-title">Delete Feedback</h3>
+                <button type="button" class="modal-close" aria-label="Close Modal">&times;</button>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <p>Are you sure you want to delete your review for <strong id="delete-modal-course-name">this course</strong>?</p>
+                <p class="text-muted" style="font-size: 0.85rem; margin-top: 0.5rem;">This action cannot be undone.</p>
+            </div>
+            <input type="hidden" id="delete-feedback-id">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+                <button type="button" id="btn-confirm-delete-feedback" class="btn btn-danger">Delete Review</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/student.js"></script>
+</body>
+</html>
